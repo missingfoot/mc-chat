@@ -19,7 +19,7 @@ import java.util.List;
 public final class ChatPanelRenderer {
 	public static final int ACCENT = 0x7FB2FF;
 	public static final int MARGIN_X = 4;
-	public static final int BOTTOM_OFFSET = 46;
+	public static final int BOTTOM_OFFSET = 50;
 
 	private static final int PAD = 3;
 	private static final int TIME_COLOR = 0x8A8A8A;

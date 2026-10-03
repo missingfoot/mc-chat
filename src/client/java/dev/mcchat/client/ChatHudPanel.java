@@ -21,6 +21,9 @@ public final class ChatHudPanel {
 			}
 			return;
 		}
+		if (mc.gui.screen() instanceof CompactChatScreen) {
+			return;
+		}
 		McChatConfig cfg = McChatClient.config();
 		ChatPanelRenderer.draw(g, mc.font, cfg, ClientChatState.entries(), cfg.visibleLines, 0, false,
 				g.guiHeight() - ChatPanelRenderer.BOTTOM_OFFSET);

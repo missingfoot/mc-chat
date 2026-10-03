@@ -1,0 +1,13 @@
+{
+	"schemaVersion": 1,
+	"id": "mcchat-gametest",
+	"version": "1.0.0",
+	"name": "MC Chat Game Tests",
+	"environment": "*",
+	"entrypoints": {
+		"fabric-client-gametest": ["dev.mcchat.gametest.McChatClientGameTest"]
+	},
+	"depends": {
+		"mcchat": "*"
+	}
+}

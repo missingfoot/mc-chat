@@ -50,7 +50,9 @@ public class McChatClient implements ClientModInitializer {
 		if (!ChatRules.isFromOther(message, localId)) {
 			return;
 		}
-		ClientChatState.markUnread();
+		if (!(client.gui.screen() instanceof CompactChatScreen)) {
+			ClientChatState.markUnread();
+		}
 		if (config.soundEnabled) {
 			client.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_BELL.value(), 1.8f, (float) config.soundVolume));
 		}

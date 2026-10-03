@@ -1,7 +1,7 @@
-[22:27:27] [Test worker/WARN]: Skipping corrupt chat history line: not json at all
-[22:27:27] [Test worker/WARN]: Skipping corrupt chat history line: {"senderId":"not-a-uuid","senderName":"x","text":"y","timestampMillis":1}
-[22:27:27] [Test worker/WARN]: Skipping corrupt chat history line: {"text":"missing fields"}
-[22:27:27] [Test worker/WARN]: Couldn't read /tmp/junit-7710217011946649448/mcchat.json, using defaults
+[22:29:53] [Test worker/WARN]: Skipping corrupt chat history line: not json at all
+[22:29:53] [Test worker/WARN]: Skipping corrupt chat history line: {"senderId":"not-a-uuid","senderName":"x","text":"y","timestampMillis":1}
+[22:29:53] [Test worker/WARN]: Skipping corrupt chat history line: {"text":"missing fields"}
+[22:29:53] [Test worker/WARN]: Couldn't read /tmp/junit-15121995582757379950/mcchat.json, using defaults
 com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Expected ':' at line 1 column 9 path $.this
 See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
 	at com.google.gson.Gson.fromJson(Gson.java:1106)
@@ -106,7 +106,7 @@ See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
 	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory$Adapter.read(ReflectiveTypeAdapterFactory.java:515)
 	at com.google.gson.Gson.fromJson(Gson.java:1080)
 	... 93 more
-[22:27:27] [Test worker/WARN]: Invalid mcchat.json value scale=9.0, using default
-[22:27:27] [Test worker/WARN]: Invalid mcchat.json value width=5, using default
-[22:27:27] [Test worker/WARN]: Invalid mcchat.json value visibleLines=-1, using default
-[22:27:27] [Test worker/WARN]: Invalid mcchat.json value soundVolume=3.0, using default
+[22:29:53] [Test worker/WARN]: Invalid mcchat.json value scale=9.0, using default
+[22:29:53] [Test worker/WARN]: Invalid mcchat.json value width=5, using default
+[22:29:53] [Test worker/WARN]: Invalid mcchat.json value visibleLines=-1, using default
+[22:29:53] [Test worker/WARN]: Invalid mcchat.json value soundVolume=3.0, using default

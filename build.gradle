@@ -57,3 +57,14 @@ java {
 test {
 	useJUnitPlatform()
 }
+
+// Automated in-game checks: ./gradlew runClientGameTest (opens a real client, not shipped in the jar)
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		modId = "mcchat-gametest"
+		enableGameTests = false
+		enableClientGameTests = true
+		eula = true
+	}
+}
