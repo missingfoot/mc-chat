@@ -1,15 +1,15 @@
-[22:34:29] [Test worker/WARN]: Skipping corrupt chat history line: not json at all
-[22:34:29] [Test worker/WARN]: Skipping corrupt chat history line: {"senderId":"not-a-uuid","senderName":"x","text":"y","timestampMillis":1}
-[22:34:29] [Test worker/WARN]: Skipping corrupt chat history line: {"text":"missing fields"}
-[22:34:29] [Test worker/WARN]: Couldn't read /tmp/junit-16300236730655374963/mcchat.json, using defaults
+[00:55:18] [Test worker/WARN]: Skipping corrupt chat history line: not json at all
+[00:55:18] [Test worker/WARN]: Skipping corrupt chat history line: {"senderId":"not-a-uuid","senderName":"x","text":"y","timestampMillis":1}
+[00:55:18] [Test worker/WARN]: Skipping corrupt chat history line: {"text":"missing fields"}
+[00:55:18] [Test worker/WARN]: Couldn't read /tmp/junit-6134011658585110654/mcchat.json, using defaults
 com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Expected ':' at line 1 column 9 path $.this
 See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
 	at com.google.gson.Gson.fromJson(Gson.java:1106)
 	at com.google.gson.Gson.fromJson(Gson.java:981)
 	at com.google.gson.Gson.fromJson(Gson.java:891)
 	at com.google.gson.Gson.fromJson(Gson.java:828)
-	at dev.mcchat.core.McChatConfig.load(McChatConfig.java:37)
-	at dev.mcchat.core.McChatConfigTest.corruptFileGivesDefaultsAndIsNotOverwritten(McChatConfigTest.java:59)
+	at dev.mcchat.core.McChatConfig.load(McChatConfig.java:34)
+	at dev.mcchat.core.McChatConfigTest.corruptFileGivesDefaultsAndIsNotOverwritten(McChatConfigTest.java:56)
 	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
 	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:787)
@@ -106,7 +106,7 @@ See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
 	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory$Adapter.read(ReflectiveTypeAdapterFactory.java:515)
 	at com.google.gson.Gson.fromJson(Gson.java:1080)
 	... 93 more
-[22:34:29] [Test worker/WARN]: Invalid mcchat.json value scale=9.0, using default
-[22:34:29] [Test worker/WARN]: Invalid mcchat.json value width=5, using default
-[22:34:29] [Test worker/WARN]: Invalid mcchat.json value visibleLines=-1, using default
-[22:34:29] [Test worker/WARN]: Invalid mcchat.json value soundVolume=3.0, using default
+[00:55:19] [Test worker/WARN]: Invalid mcchat.json value scale=9.0, using default
+[00:55:19] [Test worker/WARN]: Invalid mcchat.json value width=5, using default
+[00:55:19] [Test worker/WARN]: Invalid mcchat.json value visibleLines=-1, using default
+[00:55:19] [Test worker/WARN]: Invalid mcchat.json value soundVolume=3.0, using default

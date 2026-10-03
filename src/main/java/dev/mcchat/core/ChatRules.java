@@ -5,6 +5,7 @@ import java.util.UUID;
 /** Small display rules shared by the HUD panel and the chat screen. */
 public final class ChatRules {
 	public static final long GROUP_WINDOW_MILLIS = 120_000;
+	public static final long FADE_MILLIS = 1_000;
 
 	private ChatRules() {
 	}
@@ -18,9 +19,20 @@ public final class ChatRules {
 		return gap < 0 || gap > GROUP_WINDOW_MILLIS;
 	}
 
-	/** Full opacity while new, then settle to the dim opacity. Never fades out completely. */
-	public static float lineAlpha(long receivedAtMillis, long nowMillis, int brightSeconds, float dimOpacity) {
-		return nowMillis - receivedAtMillis < brightSeconds * 1000L ? 1f : dimOpacity;
+	/** 0 while a message is new, ramping to 1 over FADE_MILLIS once it has been visible for brightSeconds. */
+	public static float fadeProgress(long receivedAtMillis, long nowMillis, int brightSeconds) {
+		long sinceFadeStart = nowMillis - receivedAtMillis - brightSeconds * 1000L;
+		return Math.clamp(sinceFadeStart / (float) FADE_MILLIS, 0f, 1f);
+	}
+
+	/** Text and head opacity: full when new, settling to the dim opacity. Never fades out completely. */
+	public static float lineAlpha(float fadeProgress, float dimOpacity) {
+		return 1f + (dimOpacity - 1f) * fadeProgress;
+	}
+
+	/** Background box opacity: full when new, gone once faded. */
+	public static float boxAlpha(float fadeProgress) {
+		return 1f - fadeProgress;
 	}
 
 	/** True unless the message was sent by the local player. Unknown local id counts as "other". */

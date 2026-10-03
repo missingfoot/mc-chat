@@ -26,30 +26,27 @@ class McChatConfigTest {
 		assertEquals(0.45, cfg.dimOpacity);
 		assertTrue(cfg.soundEnabled);
 		assertEquals(0.4, cfg.soundVolume);
-		assertTrue(cfg.nameColors.isEmpty());
 		assertTrue(Files.exists(file));
 	}
 
 	@Test
 	void partialFileKeepsDefaultsForMissingKeys() throws IOException {
 		Path file = dir.resolve("mcchat.json");
-		Files.writeString(file, "{\"width\": 250, \"nameColors\": {\"Friend\": \"#FF00AA\"}}");
+		Files.writeString(file, "{\"width\": 250}");
 		McChatConfig cfg = McChatConfig.load(file);
 		assertEquals(250, cfg.width);
 		assertEquals(0.75, cfg.scale);
-		assertEquals("#FF00AA", cfg.nameColors.get("Friend"));
 	}
 
 	@Test
 	void outOfRangeValuesFallBackToDefaults() throws IOException {
 		Path file = dir.resolve("mcchat.json");
-		Files.writeString(file, "{\"scale\": 9, \"width\": 5, \"visibleLines\": -1, \"soundVolume\": 3, \"nameColors\": null}");
+		Files.writeString(file, "{\"scale\": 9, \"width\": 5, \"visibleLines\": -1, \"soundVolume\": 3}");
 		McChatConfig cfg = McChatConfig.load(file);
 		assertEquals(0.75, cfg.scale);
 		assertEquals(200, cfg.width);
 		assertEquals(5, cfg.visibleLines);
 		assertEquals(0.4, cfg.soundVolume);
-		assertTrue(cfg.nameColors.isEmpty());
 	}
 
 	@Test

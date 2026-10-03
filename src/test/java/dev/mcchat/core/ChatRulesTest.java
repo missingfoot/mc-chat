@@ -39,10 +39,25 @@ class ChatRulesTest {
 	}
 
 	@Test
-	void lineAlphaBrightThenDim() {
-		assertEquals(1f, ChatRules.lineAlpha(1_000, 1_000 + 29_000, 30, 0.45f));
-		assertEquals(0.45f, ChatRules.lineAlpha(1_000, 1_000 + 31_000, 30, 0.45f));
-		assertEquals(0.45f, ChatRules.lineAlpha(0, 1_759_500_000_000L, 30, 0.45f)); // history entries (received at 0) start dim
+	void fadeProgressIsZeroWhileBrightThenRampsToOne() {
+		assertEquals(0f, ChatRules.fadeProgress(1_000, 1_000 + 29_000, 30));
+		assertEquals(0.5f, ChatRules.fadeProgress(1_000, 1_000 + 30_500, 30), 0.001f);
+		assertEquals(1f, ChatRules.fadeProgress(1_000, 1_000 + 31_000, 30));
+		assertEquals(1f, ChatRules.fadeProgress(0, 1_759_500_000_000L, 30)); // history entries (received at 0) start faded
+	}
+
+	@Test
+	void lineAlphaGoesFromFullToDim() {
+		assertEquals(1f, ChatRules.lineAlpha(0f, 0.45f));
+		assertEquals(0.725f, ChatRules.lineAlpha(0.5f, 0.45f), 0.001f);
+		assertEquals(0.45f, ChatRules.lineAlpha(1f, 0.45f));
+	}
+
+	@Test
+	void boxAlphaFadesOutCompletely() {
+		assertEquals(1f, ChatRules.boxAlpha(0f));
+		assertEquals(0.5f, ChatRules.boxAlpha(0.5f), 0.001f);
+		assertEquals(0f, ChatRules.boxAlpha(1f));
 	}
 
 	@Test

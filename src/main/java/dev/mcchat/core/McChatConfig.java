@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /** Client settings, read from config/mcchat.json. Field initializers are the defaults. */
 public final class McChatConfig {
@@ -26,7 +24,6 @@ public final class McChatConfig {
 	public double dimOpacity = 0.45;
 	public boolean soundEnabled = true;
 	public double soundVolume = 0.4;
-	public Map<String, String> nameColors = new LinkedHashMap<>();
 
 	/** Loads the config, creating it with defaults if missing. A broken file is left alone so it can be fixed by hand. */
 	public static McChatConfig load(Path file) {
@@ -83,9 +80,6 @@ public final class McChatConfig {
 		if (!(soundVolume >= 0.0 && soundVolume <= 1.0)) {
 			warn("soundVolume", soundVolume);
 			soundVolume = d.soundVolume;
-		}
-		if (nameColors == null) {
-			nameColors = new LinkedHashMap<>();
 		}
 	}
 
