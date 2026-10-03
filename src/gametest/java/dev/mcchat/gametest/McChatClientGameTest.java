@@ -7,6 +7,9 @@ import dev.mcchat.core.ChatMessage;
 import dev.mcchat.net.DeliverPayload;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerConnection;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerContext;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerConnection;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.world.TestWorldSave;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -75,17 +78,30 @@ public class McChatClientGameTest implements FabricClientGameTest {
 			check(texts.equals(List.of("hello 💖 cred", "second message", "third message")), "history restored, got: " + texts);
 			context.takeScreenshot("mcchat-05-history-after-rejoin");
 		}
+
+		// Over a real network connection to a dedicated server (exercises payload encoding end to end).
+		try (TestDedicatedServerContext server = context.worldBuilder().createServer();
+				TestDedicatedServerConnection connection = server.connect()) {
+			connection.waitForChunksRender();
+			send(context, connection, "over the network 💖");
+			check(lastText(context).equals("over the network 💖"), "dedicated server round trip, got: " + lastText(context));
+			context.takeScreenshot("mcchat-06-dedicated-server");
+		}
 	}
 
 	private static void send(ClientGameTestContext context, TestSingleplayerContext world, String text) {
+		send(context, world.getConnection(), text);
+	}
+
+	private static void send(ClientGameTestContext context, TestServerConnection connection, String text) {
 		int before = entryCount(context);
 		context.getInput().pressKey(options -> options.keyChat);
 		context.waitForScreen(CompactChatScreen.class);
 		context.getInput().typeChars(text);
 		context.getInput().pressKey(InputConstants.KEY_RETURN);
 		context.waitForScreen(null);
-		world.getConnection().waitForServerboundPackets();
-		world.getConnection().waitForClientboundPackets();
+		connection.waitForServerboundPackets();
+		connection.waitForClientboundPackets();
 		context.waitFor(mc -> ClientChatState.entries().size() > before);
 	}
 
