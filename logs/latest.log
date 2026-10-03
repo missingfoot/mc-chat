@@ -1,0 +1,3 @@
+[22:24:48] [Test worker/WARN]: Skipping corrupt chat history line: not json at all
+[22:24:48] [Test worker/WARN]: Skipping corrupt chat history line: {"senderId":"not-a-uuid","senderName":"x","text":"y","timestampMillis":1}
+[22:24:48] [Test worker/WARN]: Skipping corrupt chat history line: {"text":"missing fields"}
