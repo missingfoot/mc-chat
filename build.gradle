@@ -99,7 +99,7 @@ tasks.register("prepareDevServer") {
 		new File(dir, "eula.txt").text = "eula=true\n"
 		def props = new File(dir, "server.properties")
 		if (!props.exists()) {
-			props.text = "online-mode=false\nmotd=MC Chat test server\nspawn-protection=0\ngamemode=creative\n"
+			props.text = "online-mode=false\nmotd=MC Chat test server\nspawn-protection=0\ngamemode=creative\nwhite-list=false\n"
 		}
 	}
 }
