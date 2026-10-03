@@ -1,0 +1,26 @@
+{
+	"schemaVersion": 1,
+	"id": "mcchat",
+	"version": "${version}",
+	"name": "MC Chat",
+	"description": "A compact, persistent private chat that runs over its own network channel.",
+	"authors": ["James"],
+	"license": "MIT",
+	"environment": "*",
+	"entrypoints": {
+		"main": ["dev.mcchat.McChat"],
+		"client": ["dev.mcchat.client.McChatClient"]
+	},
+	"mixins": [
+		{
+			"config": "mcchat.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
