@@ -65,7 +65,8 @@ One mod jar, three source areas:
 - **`ClientChatState`**: in-memory list of received messages (the history payload
   replaces it; deliveries append), each tagged with its local receive time for
   fade/brightness, plus an `unread` flag. Cleared on disconnect.
-- **`ChatHudPanel`** (registered via Fabric HUD element API), bottom-left above the hotbar:
+- **`ChatHudPanel`** (drawn from a client mixin at the end of `Hud.extractRenderState`, so it
+  can still draw the unread dot while F1 hides the HUD), bottom-left above the hotbar:
   - Text scale 0.75, width ~200px (scaled px), no heavy box: a translucent card
     background (~25% black) with a 1px coloured accent strip on the left edge.
   - Line format: `HH:mm` (dim grey) + name (player colour) + message; long messages
@@ -87,10 +88,10 @@ One mod jar, three source areas:
   - If the server can't receive the channel, show an inline red line
     "MC Chat isn't installed on the server" instead of sending.
   - Opening the screen clears the unread flag.
-- **Keybind**: `KeyMapping` "Open MC Chat", default T, category "MC Chat", registered
-  via Fabric's keybinding helper. A mixin prevents vanilla `keyChat` from opening the
-  vanilla chat screen when it is bound to the same key as ours, so T opens only our
-  screen. `/` (vanilla `keyCommand`) is untouched.
+- **Keybind**: the mod takes over vanilla's "Open Chat" key (T by default, rebindable in
+  Controls). A client mixin on `Gui.openChatScreen(ChatMethod)` opens `CompactChatScreen`
+  instead of vanilla's chat screen when the method is `MESSAGE`. `COMMAND` (the `/` key)
+  is untouched, so vanilla command chat still works.
 - **Notification**: when a delivery arrives from someone other than the local player,
   play a soft chime (`SoundEvents.NOTE_BLOCK_BELL`, high pitch, low volume) locally and
   set `unread`.
