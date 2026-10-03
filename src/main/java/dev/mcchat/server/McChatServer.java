@@ -14,11 +14,16 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.storage.LevelResource;
 
 import java.nio.file.Path;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 /** Relays chat between players and keeps the per-world history file. Runs on integrated and dedicated servers. */
 public final class McChatServer {
 	public static final int JOIN_HISTORY_SIZE = 100;
 
+	private static final List<Consumer<ChatMessage>> LISTENERS = new CopyOnWriteArrayList<>();
 	private static ChatHistoryStore store;
 
 	private McChatServer() {
@@ -45,18 +50,31 @@ public final class McChatServer {
 		});
 	}
 
+	/** Called on the server thread after every relayed message (used by the dev Friend bot). */
+	public static void addListener(Consumer<ChatMessage> listener) {
+		LISTENERS.add(listener);
+	}
+
 	private static void onSend(MinecraftServer server, ServerPlayer player, String raw) {
+		broadcast(server, player.getUUID(), player.getName().getString(), raw);
+	}
+
+	/** Sanitizes, records and delivers a message to every player that has the mod. Server thread only. */
+	public static void broadcast(MinecraftServer server, UUID senderId, String senderName, String raw) {
 		String text = TextSanitizer.sanitize(raw);
 		if (text.isEmpty() || store == null) {
 			return;
 		}
-		ChatMessage message = new ChatMessage(player.getUUID(), player.getName().getString(), text, System.currentTimeMillis());
+		ChatMessage message = new ChatMessage(senderId, senderName, text, System.currentTimeMillis());
 		store.append(message);
 		DeliverPayload delivery = new DeliverPayload(message);
 		for (ServerPlayer target : server.getPlayerList().getPlayers()) {
 			if (ServerPlayNetworking.canSend(target, DeliverPayload.TYPE)) {
 				ServerPlayNetworking.send(target, delivery);
 			}
+		}
+		for (Consumer<ChatMessage> listener : LISTENERS) {
+			listener.accept(message);
 		}
 	}
 }

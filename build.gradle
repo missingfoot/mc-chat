@@ -23,6 +23,12 @@ loom {
 			runDir "run2"
 			programArgs "--username", "Friend"
 		}
+		// Client that joins the dev server directly: ./gradlew runClientJoin
+		clientJoin {
+			client()
+			configName = "Minecraft Client (joins dev server)"
+			programArgs "--username", "Host", "--quickPlayMultiplayer", "localhost"
+		}
 	}
 }
 
@@ -68,3 +74,33 @@ fabricApi {
 		eula = true
 	}
 }
+
+// Local dedicated server with the dev Friend bot: ./gradlew runDevServer
+// (declared after fabricApi.configureTests, which creates the gametest source set)
+loom {
+	runs {
+		devServer {
+			server()
+			configName = "Dev Server + Friend bot"
+			source sourceSets.gametest
+			runDir "run-server"
+			property "mcchat.friendbot", "true"
+			programArgs "nogui"
+		}
+	}
+}
+
+// Offline-mode server settings for runDevServer (written once; edit run-server/server.properties freely)
+def devServerDir = layout.projectDirectory.dir("run-server").asFile
+tasks.register("prepareDevServer") {
+	def dir = devServerDir
+	doLast {
+		dir.mkdirs()
+		new File(dir, "eula.txt").text = "eula=true\n"
+		def props = new File(dir, "server.properties")
+		if (!props.exists()) {
+			props.text = "online-mode=false\nmotd=MC Chat test server\nspawn-protection=0\ngamemode=creative\n"
+		}
+	}
+}
+tasks.matching { it.name == "runDevServer" }.configureEach { dependsOn "prepareDevServer" }
