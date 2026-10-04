@@ -99,4 +99,35 @@ class ChatHistoryStoreTest {
 		reloaded.load();
 		assertEquals(List.of(msg(3), msg(4), msg(5)), reloaded.recent(10));
 	}
+
+	@Test
+	void aLineWithInvalidUtf8IsSkippedNotTheWholeFile() throws IOException {
+		Path file = dir.resolve("h.jsonl");
+		ChatHistoryStore writer = new ChatHistoryStore(file, 10);
+		writer.load();
+		writer.append(msg(1));
+		Files.write(file, new byte[] {'{', '"', (byte) 0xF0, (byte) 0x9F, '\n'}, java.nio.file.StandardOpenOption.APPEND);
+		writer.append(msg(2));
+
+		ChatHistoryStore reloaded = new ChatHistoryStore(file, 10);
+		reloaded.load();
+		assertEquals(List.of(msg(1), msg(2)), reloaded.recent(10));
+	}
+
+	@Test
+	void appendAfterATornLastLineStartsOnANewLine() throws IOException {
+		Path file = dir.resolve("h.jsonl");
+		ChatHistoryStore writer = new ChatHistoryStore(file, 10);
+		writer.load();
+		writer.append(msg(1));
+		Files.writeString(file, "{\"senderId\":\"00000000-0000", java.nio.file.StandardOpenOption.APPEND); // crash mid-write
+
+		ChatHistoryStore afterCrash = new ChatHistoryStore(file, 10);
+		afterCrash.load();
+		afterCrash.append(msg(2));
+
+		ChatHistoryStore reloaded = new ChatHistoryStore(file, 10);
+		reloaded.load();
+		assertEquals(List.of(msg(1), msg(2)), reloaded.recent(10));
+	}
 }

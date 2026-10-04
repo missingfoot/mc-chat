@@ -57,7 +57,9 @@ public class McChatClient implements ClientModInitializer {
 						.then(ClientCommands.argument("size", IntegerArgumentType.integer(McChatConfig.MIN_TEXT_SIZE, McChatConfig.MAX_TEXT_SIZE))
 								.executes(c -> {
 									config.textSize = IntegerArgumentType.getInteger(c, "size");
-									config.save(configFile);
+									if (!config.save(configFile)) {
+										c.getSource().sendError(Component.literal("Size changed for this session only: config/mcchat.json has errors, fix it to save"));
+									}
 									return reportSize(c.getSource());
 								}))));
 	}

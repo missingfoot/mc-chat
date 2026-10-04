@@ -53,4 +53,13 @@ class SentHistoryTest {
 		assertEquals(List.of("b", "c", "d"), h.entries());
 		assertEquals(List.of("b", "c", "d"), new SentHistory(file, 3).load().entries());
 	}
+
+	@Test
+	void aLineWithInvalidUtf8DoesNotLoseTheRest() throws java.io.IOException {
+		Path file = dir.resolve("sent.txt");
+		java.nio.file.Files.write(file, new byte[] {'o', 'k', '\n', (byte) 0xF0, (byte) 0x9F, '\n', 'f', 'i', 'n', 'e', '\n'});
+		List<String> entries = new SentHistory(file, 5).load().entries();
+		assertEquals("ok", entries.getFirst());
+		assertEquals("fine", entries.getLast());
+	}
 }

@@ -12,6 +12,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.PlayerSkin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /** Draws the chat card: chat heads, small wrapped lines, and a background box that fades away with the text. */
@@ -52,31 +53,16 @@ public final class ChatPanelRenderer {
 
 	/**
 	 * Draws up to {@code maxLines} wrapped lines ending {@code scroll} lines back from the newest,
-	 * with the card's bottom edge at {@code bottomY}. Returns the total number of wrapped lines.
-	 * The whole panel fades as one, timed from the newest message, unless {@code forceBright}.
+	 * with the card's bottom edge at {@code bottomY}. The whole panel fades as one, timed from the newest
+	 * message, unless {@code forceBright}. Returns the number of wrapped lines laid out: the full total when
+	 * {@code forceBright} (the chat screen uses it to clamp scrolling), otherwise just what the HUD needed.
 	 */
 	public static int draw(GuiGraphicsExtractor g, Font font, McChatConfig cfg, List<ClientChatState.Entry> entries,
 			int maxLines, int scroll, boolean forceBright, int bottomY) {
-		float scale = ChatRules.textScale(Minecraft.getInstance().getWindow().getGuiScale(), cfg.textSize);
-		int headSize = font.lineHeight - 1;
-		int textX = headSize + HEAD_GAP;
-		int innerWidth = Math.max(40, (int) ((cfg.width - PAD * 2 - 2) / scale) - textX);
-
-		List<Line> lines = new ArrayList<>();
-		ChatMessage previous = null;
-		for (ClientChatState.Entry entry : entries) {
-			ChatMessage m = entry.message();
-			PlayerSkin head = ChatRules.showHeader(previous, m) ? SkinCache.skinFor(m.senderId()) : null;
-			for (FormattedCharSequence seq : font.split(Component.literal(m.text()), innerWidth)) {
-				lines.add(new Line(seq, head));
-				head = null;
-			}
-			previous = m;
+		if (entries.isEmpty() || maxLines <= 0) {
+			return 0;
 		}
-		if (lines.isEmpty() || maxLines <= 0) {
-			return lines.size();
-		}
-
+		// Work out the fade first: the HUD panel is fully faded most of the time, and then there's nothing to lay out.
 		float textAlpha = 1f;
 		float boxAlpha = 1f;
 		if (!forceBright) {
@@ -85,9 +71,28 @@ public final class ChatPanelRenderer {
 			textAlpha = ChatRules.textAlpha(newest, now, cfg.brightSeconds, cfg.dimSeconds, cfg.fadeSeconds, (float) cfg.dimOpacity);
 			boxAlpha = ChatRules.boxAlpha(newest, now, cfg.brightSeconds);
 			if (textAlpha < MIN_VISIBLE_ALPHA) {
-				return lines.size();
+				return 0;
 			}
 		}
+
+		float scale = ChatRules.textScale(Minecraft.getInstance().getWindow().getGuiScale(), cfg.textSize);
+		int headSize = font.lineHeight - 1;
+		int textX = headSize + HEAD_GAP;
+		int innerWidth = Math.max(40, (int) ((cfg.width - PAD * 2 - 2) / scale) - textX);
+
+		// Wrap from the newest message backwards, stopping once the HUD has enough lines.
+		int needed = forceBright ? Integer.MAX_VALUE : scroll + maxLines;
+		List<Line> lines = new ArrayList<>();
+		for (int i = entries.size() - 1; i >= 0 && lines.size() < needed; i--) {
+			ChatMessage m = entries.get(i).message();
+			ChatMessage previous = i > 0 ? entries.get(i - 1).message() : null;
+			PlayerSkin head = ChatRules.showHeader(previous, m) ? SkinCache.skinFor(m.senderId()) : null;
+			List<FormattedCharSequence> wrapped = font.split(Component.literal(m.text()), innerWidth);
+			for (int k = wrapped.size() - 1; k >= 0; k--) {
+				lines.add(new Line(wrapped.get(k), k == 0 ? head : null));
+			}
+		}
+		Collections.reverse(lines);
 
 		int[] range = ChatRules.visibleRange(lines.size(), maxLines, scroll);
 		List<Line> shown = lines.subList(range[0], range[1]);

@@ -1,13 +1,14 @@
 # MC Chat
 
-A small Fabric mod for Minecraft 26.3 that gives you a private chat that works over the mod's
+A small Fabric mod for Minecraft 26.2 and 26.3 that gives you a private chat that works over the mod's
 own network channel, so it isn't affected by Microsoft's chat restrictions. It's also nicer than vanilla
 chat: compact, bottom-left, chat heads instead of names, the panel fades away a few seconds after the last message, and
 history that survives restarts.
 
 ## Install
 
-Both players need: Fabric Loader 0.19.5+, Fabric API for 26.3, and `mcchat-1.0.0.jar` in `mods/`.
+Both players need: Fabric Loader 0.19.5+, Fabric API 0.161.0+ for your Minecraft version (26.2 or 26.3),
+and `mcchat-1.0.0.jar` in `mods/` (the same jar works on both versions).
 The host's world (LAN or dedicated server) needs the mod too — if you host from your own game,
 that's already covered.
 

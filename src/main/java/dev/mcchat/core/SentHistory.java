@@ -28,7 +28,8 @@ public final class SentHistory {
 		entries.clear();
 		if (Files.exists(file)) {
 			try {
-				for (String line : Files.readAllLines(file, StandardCharsets.UTF_8)) {
+				// new String() replaces bad bytes instead of throwing, so one damaged line doesn't lose the rest.
+				for (String line : new String(Files.readAllBytes(file), StandardCharsets.UTF_8).split("\r?\n")) {
 					if (!line.isBlank()) {
 						entries.add(line);
 					}

@@ -32,6 +32,9 @@ public final class McChatConfig {
 	public boolean soundEnabled = true;
 	public double soundVolume = 0.4;
 
+	/** False if the file failed to parse or had invalid values; save() then leaves it alone. Not serialized. */
+	private transient boolean writable = true;
+
 	/** Loads the config, creating it with defaults if missing. A broken file is left alone so it can be fixed by hand. */
 	public static McChatConfig load(Path file) {
 		McChatConfig cfg = null;
@@ -45,61 +48,83 @@ public final class McChatConfig {
 		}
 		if (cfg == null) {
 			cfg = new McChatConfig();
+			cfg.writable = !exists;
 		}
-		cfg.validate();
+		if (!cfg.validate()) {
+			cfg.writable = false;
+		}
 		if (!exists) {
 			cfg.save(file);
 		}
 		return cfg;
 	}
 
-	public void save(Path file) {
+	/** Writes the config. Returns false (and writes nothing) if the file on disk has errors the user should fix. */
+	public boolean save(Path file) {
+		if (!writable) {
+			LOG.warn("Not saving {}: it has errors, fix them by hand first", file);
+			return false;
+		}
 		try {
 			Files.createDirectories(file.getParent());
 			Files.writeString(file, GSON.toJson(this), StandardCharsets.UTF_8);
+			return true;
 		} catch (IOException e) {
 			LOG.warn("Couldn't write config {}", file, e);
+			return false;
 		}
 	}
 
-	private void validate() {
+	/** Resets invalid values to defaults; returns true if everything was already valid. */
+	private boolean validate() {
 		McChatConfig d = new McChatConfig();
+		boolean valid = true;
 		if (textSize < MIN_TEXT_SIZE || textSize > MAX_TEXT_SIZE) {
 			warn("textSize", textSize);
+			valid = false;
 			textSize = d.textSize;
 		}
 		if (width < 80 || width > 600) {
 			warn("width", width);
+			valid = false;
 			width = d.width;
 		}
 		if (visibleLines < 0 || visibleLines > 50) {
 			warn("visibleLines", visibleLines);
+			valid = false;
 			visibleLines = d.visibleLines;
 		}
 		if (expandedLines < 1 || expandedLines > 100) {
 			warn("expandedLines", expandedLines);
+			valid = false;
 			expandedLines = d.expandedLines;
 		}
 		if (brightSeconds < 0 || brightSeconds > 3600) {
 			warn("brightSeconds", brightSeconds);
+			valid = false;
 			brightSeconds = d.brightSeconds;
 		}
 		if (dimSeconds < 0 || dimSeconds > 3600) {
 			warn("dimSeconds", dimSeconds);
+			valid = false;
 			dimSeconds = d.dimSeconds;
 		}
 		if (fadeSeconds < 0 || fadeSeconds > 3600) {
 			warn("fadeSeconds", fadeSeconds);
+			valid = false;
 			fadeSeconds = d.fadeSeconds;
 		}
 		if (!(dimOpacity >= 0.1 && dimOpacity <= 1.0)) {
 			warn("dimOpacity", dimOpacity);
+			valid = false;
 			dimOpacity = d.dimOpacity;
 		}
 		if (!(soundVolume >= 0.0 && soundVolume <= 1.0)) {
 			warn("soundVolume", soundVolume);
+			valid = false;
 			soundVolume = d.soundVolume;
 		}
+		return valid;
 	}
 
 	private static void warn(String key, Object value) {

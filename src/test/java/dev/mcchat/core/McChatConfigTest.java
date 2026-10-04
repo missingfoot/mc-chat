@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class McChatConfigTest {
@@ -67,5 +68,25 @@ class McChatConfigTest {
 		cfg.textSize = -1;
 		cfg.save(file);
 		assertEquals(-1, McChatConfig.load(file).textSize);
+	}
+
+	@Test
+	void saveDoesNotOverwriteAFileThatFailedToParse() throws IOException {
+		Path file = dir.resolve("mcchat.json");
+		Files.writeString(file, "{ this is not json");
+		McChatConfig cfg = McChatConfig.load(file);
+		cfg.textSize = -1;
+		assertFalse(cfg.save(file));
+		assertEquals("{ this is not json", Files.readString(file));
+	}
+
+	@Test
+	void saveDoesNotOverwriteAFileWithInvalidValues() throws IOException {
+		Path file = dir.resolve("mcchat.json");
+		Files.writeString(file, "{\"width\": 700}");
+		McChatConfig cfg = McChatConfig.load(file);
+		cfg.textSize = -1;
+		assertFalse(cfg.save(file));
+		assertEquals("{\"width\": 700}", Files.readString(file));
 	}
 }

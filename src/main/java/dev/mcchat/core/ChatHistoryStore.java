@@ -26,6 +26,9 @@ public final class ChatHistoryStore {
 	private final int capacity;
 	private final ArrayDeque<ChatMessage> messages = new ArrayDeque<>();
 	private int linesOnDisk;
+	private boolean needsNewline;
+	/** Set when the file exists but couldn't be read; compact() then won't overwrite it. */
+	private boolean readFailed;
 
 	public ChatHistoryStore(Path file, int capacity) {
 		this.file = file;
@@ -35,17 +38,24 @@ public final class ChatHistoryStore {
 	public synchronized void load() {
 		messages.clear();
 		linesOnDisk = 0;
+		readFailed = false;
+		needsNewline = false;
 		if (!Files.exists(file)) {
 			return;
 		}
-		List<String> lines;
+		String content;
 		try {
-			lines = Files.readAllLines(file, StandardCharsets.UTF_8);
+			// Decoding via new String() replaces bad bytes instead of throwing, so one damaged line can't
+			// make the whole file unreadable (Files.readAllLines would).
+			content = new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			LOG.warn("Couldn't read chat history {}", file, e);
+			readFailed = true;
 			return;
 		}
-		for (String line : lines) {
+		// A crash mid-append can leave a partial last line; start the next append on a fresh line.
+		needsNewline = !content.isEmpty() && !content.endsWith("\n");
+		for (String line : content.split("\r?\n")) {
 			if (line.isBlank()) {
 				continue;
 			}
@@ -63,8 +73,10 @@ public final class ChatHistoryStore {
 		push(message);
 		try {
 			Files.createDirectories(file.getParent());
-			Files.writeString(file, GSON.toJson(message) + "\n", StandardCharsets.UTF_8,
+			String prefix = needsNewline ? "\n" : "";
+			Files.writeString(file, prefix + GSON.toJson(message) + "\n", StandardCharsets.UTF_8,
 					StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+			needsNewline = false;
 			linesOnDisk++;
 		} catch (IOException e) {
 			LOG.warn("Couldn't append to chat history {}", file, e);
@@ -83,7 +95,7 @@ public final class ChatHistoryStore {
 
 	/** Rewrites the file with only the in-memory messages if it has grown past capacity. */
 	public synchronized void compact() {
-		if (linesOnDisk <= capacity) {
+		if (readFailed || linesOnDisk <= capacity) {
 			return;
 		}
 		Path tmp = file.resolveSibling(file.getFileName() + ".tmp");
