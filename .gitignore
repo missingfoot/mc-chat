@@ -8,3 +8,4 @@ run2/
 .vscode/
 bin/
 run-server/
+logs/
