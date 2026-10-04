@@ -82,4 +82,31 @@ class ChatRulesTest {
 		assertArrayEquals(new int[] {0, 3}, ChatRules.visibleRange(3, 15, 0));
 		assertArrayEquals(new int[] {0, 0}, ChatRules.visibleRange(0, 15, 0));
 	}
+
+	@Test
+	void textScaleKeepsWholeScreenPixelsPerFontPixel() {
+		assertEquals(1f, ChatRules.textScale(3, 0));
+		assertEquals(2f / 3f, ChatRules.textScale(3, -1), 0.0001f);
+		assertEquals(1f / 3f, ChatRules.textScale(3, -2), 0.0001f);
+		assertEquals(5f / 3f, ChatRules.textScale(3, 2), 0.0001f);
+	}
+
+	@Test
+	void textScaleNeverGoesBelowOneScreenPixel() {
+		assertEquals(1f / 3f, ChatRules.textScale(3, -9), 0.0001f);
+		assertEquals(0.5f, ChatRules.textScale(2, -5), 0.0001f);
+		assertEquals(1f, ChatRules.textScale(1, -1));
+	}
+
+	@Test
+	void hideProgressRampsToOneAfterHideSeconds() {
+		assertEquals(0f, ChatRules.hideProgress(1_000, 1_000 + 29_000, 30));
+		assertEquals(0.5f, ChatRules.hideProgress(1_000, 1_000 + 30_500, 30), 0.001f);
+		assertEquals(1f, ChatRules.hideProgress(1_000, 1_000 + 31_000, 30));
+	}
+
+	@Test
+	void hideSecondsZeroNeverHides() {
+		assertEquals(0f, ChatRules.hideProgress(0, 1_759_500_000_000L, 0));
+	}
 }

@@ -2,7 +2,7 @@
 
 A small Fabric mod for Minecraft 26.3 that gives you a private chat that works over the mod's
 own network channel, so it isn't affected by Microsoft's chat restrictions. It's also nicer than vanilla
-chat: compact, bottom-left, chat heads instead of names, messages fade to faint text instead of vanishing, and
+chat: compact, bottom-left, chat heads instead of names, messages fade to faint text and then away, and
 history that survives restarts.
 
 ## Install
@@ -15,6 +15,8 @@ that's already covered.
 
 - **T** — open chat (rebind via Controls → "Open Chat"). **/** still opens vanilla command chat.
 - **Enter** send · **Esc** close · **Up/Down** previous messages · **Mouse wheel / PgUp / PgDn** scroll.
+- **/size** — chat text size: `/size 0` normal, `/size -1` / `-2` smaller, `/size 1` / `2` bigger.
+  Sizes stay crisp at any GUI scale.
 - A soft chime plays when the other person messages. With the HUD hidden (F1), a small blue dot
   in the bottom-left corner means there's an unread message.
 
@@ -24,11 +26,12 @@ Created on first launch. Restart the game after editing.
 
 | Key | Default | Meaning |
 |---|---|---|
-| `scale` | 0.75 | Text size (0.25–2.0) |
+| `textSize` | 0 | Text size step; 0 = vanilla size (also set in game with `/size`) |
 | `width` | 200 | Panel width in GUI pixels (80–600) |
-| `visibleLines` | 5 | Lines always shown in the corner (0 hides the panel) |
+| `visibleLines` | 5 | Most lines shown in the corner (0 hides the panel) |
 | `expandedLines` | 15 | Lines shown while typing |
 | `brightSeconds` | 10 | How long new messages stay bright (with the background box) before fading |
+| `hideSeconds` | 30 | When messages disappear from the corner (0 = never); T still shows them |
 | `dimOpacity` | 0.45 | Opacity of older lines (0.1–1.0) |
 | `soundEnabled` | true | Chime when the other person messages |
 | `soundVolume` | 0.4 | Chime volume (0–1) |

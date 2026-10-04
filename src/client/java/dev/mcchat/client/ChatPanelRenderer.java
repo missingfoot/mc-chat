@@ -3,6 +3,7 @@ package dev.mcchat.client;
 import dev.mcchat.core.ChatMessage;
 import dev.mcchat.core.ChatRules;
 import dev.mcchat.core.McChatConfig;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.PlayerFaceExtractor;
@@ -22,6 +23,7 @@ public final class ChatPanelRenderer {
 	/** Background box opacity while messages are bright (and while typing). */
 	public static final float BOX_OPACITY = 0.55f;
 
+	private static final float MIN_VISIBLE_ALPHA = 0.02f;
 	private static final int PAD = 3;
 	private static final int HEAD_GAP = 3;
 
@@ -38,7 +40,7 @@ public final class ChatPanelRenderer {
 	 */
 	public static int draw(GuiGraphicsExtractor g, Font font, McChatConfig cfg, List<ClientChatState.Entry> entries,
 			int maxLines, int scroll, boolean forceBright, int bottomY) {
-		float scale = (float) cfg.scale;
+		float scale = ChatRules.textScale(Minecraft.getInstance().getWindow().getGuiScale(), cfg.textSize);
 		int headSize = font.lineHeight - 1;
 		int textX = headSize + HEAD_GAP;
 		int innerWidth = Math.max(40, (int) ((cfg.width - PAD * 2 - 2) / scale) - textX);
@@ -49,7 +51,8 @@ public final class ChatPanelRenderer {
 		for (ClientChatState.Entry entry : entries) {
 			ChatMessage m = entry.message();
 			float fade = forceBright ? 0f : ChatRules.fadeProgress(entry.receivedAtMillis(), now, cfg.brightSeconds);
-			float alpha = ChatRules.lineAlpha(fade, (float) cfg.dimOpacity);
+			float hide = forceBright ? 0f : ChatRules.hideProgress(entry.receivedAtMillis(), now, cfg.hideSeconds);
+			float alpha = ChatRules.lineAlpha(fade, (float) cfg.dimOpacity) * (1f - hide);
 			float boxAlpha = ChatRules.boxAlpha(fade);
 			PlayerSkin head = ChatRules.showHeader(previous, m) ? SkinCache.skinFor(m.senderId()) : null;
 			for (FormattedCharSequence seq : font.split(Component.literal(m.text()), innerWidth)) {
@@ -58,6 +61,8 @@ public final class ChatPanelRenderer {
 			}
 			previous = m;
 		}
+		// Hidden (fully faded) lines take no space, so the box only wraps what's still visible.
+		lines.removeIf(line -> line.alpha() < MIN_VISIBLE_ALPHA);
 		if (lines.isEmpty() || maxLines <= 0) {
 			return lines.size();
 		}

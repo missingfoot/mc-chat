@@ -25,7 +25,15 @@ public final class ChatRules {
 		return Math.clamp(sinceFadeStart / (float) FADE_MILLIS, 0f, 1f);
 	}
 
-	/** Text and head opacity: full when new, settling to the dim opacity. Never fades out completely. */
+	/** 0 until hideSeconds after arrival, then ramps to 1 (gone) over FADE_MILLIS. hideSeconds 0 never hides. */
+	public static float hideProgress(long receivedAtMillis, long nowMillis, int hideSeconds) {
+		if (hideSeconds <= 0) {
+			return 0f;
+		}
+		return fadeProgress(receivedAtMillis, nowMillis, hideSeconds);
+	}
+
+	/** Text and head opacity while visible: full when new, settling to the dim opacity. */
 	public static float lineAlpha(float fadeProgress, float dimOpacity) {
 		return 1f + (dimOpacity - 1f) * fadeProgress;
 	}
@@ -50,5 +58,13 @@ public final class ChatRules {
 		int end = total - clampScroll(scroll, total, maxLines);
 		int begin = Math.max(0, end - maxLines);
 		return new int[] {begin, end};
+	}
+
+	/**
+	 * Pose scale for chat text: each font pixel covers {@code guiScale + sizeStep} whole screen pixels
+	 * (at least one), so the pixel font stays crisp. Step 0 is vanilla size.
+	 */
+	public static float textScale(int guiScale, int sizeStep) {
+		return Math.max(1, guiScale + sizeStep) / (float) guiScale;
 	}
 }

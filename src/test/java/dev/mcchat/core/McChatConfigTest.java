@@ -18,11 +18,12 @@ class McChatConfigTest {
 	void missingFileGivesDefaultsAndCreatesFile() {
 		Path file = dir.resolve("mcchat.json");
 		McChatConfig cfg = McChatConfig.load(file);
-		assertEquals(0.75, cfg.scale);
+		assertEquals(0, cfg.textSize);
 		assertEquals(200, cfg.width);
 		assertEquals(5, cfg.visibleLines);
 		assertEquals(15, cfg.expandedLines);
 		assertEquals(10, cfg.brightSeconds);
+		assertEquals(30, cfg.hideSeconds);
 		assertEquals(0.45, cfg.dimOpacity);
 		assertTrue(cfg.soundEnabled);
 		assertEquals(0.4, cfg.soundVolume);
@@ -35,15 +36,15 @@ class McChatConfigTest {
 		Files.writeString(file, "{\"width\": 250}");
 		McChatConfig cfg = McChatConfig.load(file);
 		assertEquals(250, cfg.width);
-		assertEquals(0.75, cfg.scale);
+		assertEquals(0, cfg.textSize);
 	}
 
 	@Test
 	void outOfRangeValuesFallBackToDefaults() throws IOException {
 		Path file = dir.resolve("mcchat.json");
-		Files.writeString(file, "{\"scale\": 9, \"width\": 5, \"visibleLines\": -1, \"soundVolume\": 3}");
+		Files.writeString(file, "{\"textSize\": 99, \"width\": 5, \"visibleLines\": -1, \"soundVolume\": 3}");
 		McChatConfig cfg = McChatConfig.load(file);
-		assertEquals(0.75, cfg.scale);
+		assertEquals(0, cfg.textSize);
 		assertEquals(200, cfg.width);
 		assertEquals(5, cfg.visibleLines);
 		assertEquals(0.4, cfg.soundVolume);
@@ -56,5 +57,14 @@ class McChatConfigTest {
 		McChatConfig cfg = McChatConfig.load(file);
 		assertEquals(200, cfg.width);
 		assertEquals("{ this is not json", Files.readString(file));
+	}
+
+	@Test
+	void saveWritesChangesThatLoadBack() {
+		Path file = dir.resolve("mcchat.json");
+		McChatConfig cfg = McChatConfig.load(file);
+		cfg.textSize = -1;
+		cfg.save(file);
+		assertEquals(-1, McChatConfig.load(file).textSize);
 	}
 }

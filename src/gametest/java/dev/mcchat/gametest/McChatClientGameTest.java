@@ -3,6 +3,7 @@ package dev.mcchat.gametest;
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.mcchat.client.ClientChatState;
 import dev.mcchat.client.CompactChatScreen;
+import dev.mcchat.client.McChatClient;
 import dev.mcchat.core.ChatMessage;
 import dev.mcchat.net.DeliverPayload;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
@@ -67,6 +68,17 @@ public class McChatClientGameTest implements FabricClientGameTest {
 			context.waitTick();
 			context.takeScreenshot("mcchat-04-f1-unread-dot");
 			context.runOnClient(mc -> mc.gui.hud.toggle());
+
+			// /size is a client command. At this window's GUI scale (2), -1 draws each font pixel as 1 screen pixel.
+			// (No window resize here: Vulkan in the sandbox loses the device when the swapchain is recreated.)
+			context.getInput().pressKey(options -> options.keyCommand);
+			context.waitForScreen(ChatScreen.class);
+			context.getInput().typeChars("size -1");
+			context.getInput().pressKey(InputConstants.KEY_RETURN);
+			context.waitForScreen(null);
+			check(context.computeOnClient(mc -> McChatClient.config().textSize) == -1, "/size -1 sets text size");
+			send(context, world, "crisp text at size -1");
+			context.takeScreenshot("mcchat-05a-size-minus-1");
 		}
 
 		// History survives leaving and reopening the world.
@@ -75,7 +87,7 @@ public class McChatClientGameTest implements FabricClientGameTest {
 			world.getConnection().waitForClientboundPackets();
 			context.waitTick();
 			List<String> texts = context.computeOnClient(mc -> ClientChatState.entries().stream().map(e -> e.message().text()).toList());
-			check(texts.equals(List.of("hello 💖 cred", "second message", "third message")), "history restored, got: " + texts);
+			check(texts.equals(List.of("hello 💖 cred", "second message", "third message", "crisp text at size -1")), "history restored, got: " + texts);
 			context.takeScreenshot("mcchat-05-history-after-rejoin");
 		}
 

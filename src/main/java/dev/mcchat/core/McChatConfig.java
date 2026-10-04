@@ -16,11 +16,17 @@ public final class McChatConfig {
 	private static final Logger LOG = LoggerFactory.getLogger("mcchat");
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-	public double scale = 0.75;
+	public static final int MIN_TEXT_SIZE = -5;
+	public static final int MAX_TEXT_SIZE = 10;
+
+	/** Chat text size step: 0 is vanilla size, each step is one screen pixel per font pixel (see ChatRules.textScale). */
+	public int textSize = 0;
 	public int width = 200;
 	public int visibleLines = 5;
 	public int expandedLines = 15;
 	public int brightSeconds = 10;
+	/** Seconds after arrival when a message disappears from the corner panel (0 = never). Still shown when chat is open. */
+	public int hideSeconds = 30;
 	public double dimOpacity = 0.45;
 	public boolean soundEnabled = true;
 	public double soundVolume = 0.4;
@@ -41,21 +47,25 @@ public final class McChatConfig {
 		}
 		cfg.validate();
 		if (!exists) {
-			try {
-				Files.createDirectories(file.getParent());
-				Files.writeString(file, GSON.toJson(cfg), StandardCharsets.UTF_8);
-			} catch (IOException e) {
-				LOG.warn("Couldn't write default config {}", file, e);
-			}
+			cfg.save(file);
 		}
 		return cfg;
 	}
 
+	public void save(Path file) {
+		try {
+			Files.createDirectories(file.getParent());
+			Files.writeString(file, GSON.toJson(this), StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			LOG.warn("Couldn't write config {}", file, e);
+		}
+	}
+
 	private void validate() {
 		McChatConfig d = new McChatConfig();
-		if (!(scale >= 0.25 && scale <= 2.0)) {
-			warn("scale", scale);
-			scale = d.scale;
+		if (textSize < MIN_TEXT_SIZE || textSize > MAX_TEXT_SIZE) {
+			warn("textSize", textSize);
+			textSize = d.textSize;
 		}
 		if (width < 80 || width > 600) {
 			warn("width", width);
@@ -72,6 +82,10 @@ public final class McChatConfig {
 		if (brightSeconds < 0 || brightSeconds > 3600) {
 			warn("brightSeconds", brightSeconds);
 			brightSeconds = d.brightSeconds;
+		}
+		if (hideSeconds < 0 || hideSeconds > 86400) {
+			warn("hideSeconds", hideSeconds);
+			hideSeconds = d.hideSeconds;
 		}
 		if (!(dimOpacity >= 0.1 && dimOpacity <= 1.0)) {
 			warn("dimOpacity", dimOpacity);
