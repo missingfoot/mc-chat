@@ -1,7 +1,7 @@
-[01:36:40] [Test worker/WARN]: Skipping corrupt chat history line: not json at all
-[01:36:40] [Test worker/WARN]: Skipping corrupt chat history line: {"senderId":"not-a-uuid","senderName":"x","text":"y","timestampMillis":1}
-[01:36:40] [Test worker/WARN]: Skipping corrupt chat history line: {"text":"missing fields"}
-[01:36:40] [Test worker/WARN]: Couldn't read /tmp/junit-14595603694859673869/mcchat.json, using defaults
+[01:41:19] [Test worker/WARN]: Skipping corrupt chat history line: not json at all
+[01:41:19] [Test worker/WARN]: Skipping corrupt chat history line: {"senderId":"not-a-uuid","senderName":"x","text":"y","timestampMillis":1}
+[01:41:19] [Test worker/WARN]: Skipping corrupt chat history line: {"text":"missing fields"}
+[01:41:19] [Test worker/WARN]: Couldn't read /tmp/junit-17866523642119348543/mcchat.json, using defaults
 com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Expected ':' at line 1 column 9 path $.this
 See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
 	at com.google.gson.Gson.fromJson(Gson.java:1106)
@@ -106,7 +106,7 @@ See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
 	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory$Adapter.read(ReflectiveTypeAdapterFactory.java:515)
 	at com.google.gson.Gson.fromJson(Gson.java:1080)
 	... 93 more
-[01:36:40] [Test worker/WARN]: Invalid mcchat.json value textSize=99, using default
-[01:36:40] [Test worker/WARN]: Invalid mcchat.json value width=5, using default
-[01:36:40] [Test worker/WARN]: Invalid mcchat.json value visibleLines=-1, using default
-[01:36:40] [Test worker/WARN]: Invalid mcchat.json value soundVolume=3.0, using default
+[01:41:19] [Test worker/WARN]: Invalid mcchat.json value textSize=99, using default
+[01:41:19] [Test worker/WARN]: Invalid mcchat.json value width=5, using default
+[01:41:19] [Test worker/WARN]: Invalid mcchat.json value visibleLines=-1, using default
+[01:41:19] [Test worker/WARN]: Invalid mcchat.json value soundVolume=3.0, using default

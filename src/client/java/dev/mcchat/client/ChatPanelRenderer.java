@@ -100,10 +100,12 @@ public final class ChatPanelRenderer {
 		}
 
 		int color = argb(textAlpha, 0xFFFFFF);
+		// Lay lines out from the bottom edge up, so the newest line never moves when lines are added
+		// (a line's height in GUI pixels is often fractional, so top-down layout would jitter by a pixel).
 		g.pose().pushMatrix();
-		g.pose().translate(x0 + PAD + 2, y0 + PAD);
+		g.pose().translate(x0 + PAD + 2, y1 - PAD);
 		g.pose().scale(scale, scale);
-		int y = 0;
+		int y = -shown.size() * lineHeight;
 		for (Line line : shown) {
 			if (line.head() != null) {
 				PlayerFaceExtractor.extractRenderState(g, line.head(), 0, y, headSize, color);
