@@ -22,7 +22,6 @@ import net.minecraft.util.Mth;
  * kept in scaled units and mouse positions are converted to match.
  */
 public class CompactChatScreen extends Screen {
-	private static final int INPUT_PAD = 5;
 	private static final int SUGGESTION_FILL = 0xD0000000;
 	private static final int ERROR_COLOR = 0xFFFF6B6B;
 	private static final String NOT_INSTALLED = "MC Chat isn't installed on the server";
@@ -46,10 +45,10 @@ public class CompactChatScreen extends Screen {
 	protected void init() {
 		McChatConfig cfg = McChatClient.config();
 		scale = ChatRules.textScale(minecraft.getWindow().getGuiScale(), cfg.textSize);
-		boxHeight = font.lineHeight + INPUT_PAD;
+		boxHeight = font.lineHeight + ChatPanelRenderer.INPUT_PAD;
 		boxX = Math.round(ChatPanelRenderer.MARGIN_X / scale);
 		boxWidth = Math.round(cfg.width / scale);
-		boxTop = (int) Math.floor((height - ChatPanelRenderer.BOTTOM_OFFSET) / scale) - boxHeight;
+		boxTop = ChatPanelRenderer.inputTop(height, font, scale);
 
 		input = new EditBox(font, boxX + 4, boxTop + 3, boxWidth - 8, boxHeight - 4, Component.literal("Message"));
 		input.setMaxLength(TextSanitizer.MAX_LENGTH);
@@ -88,7 +87,7 @@ public class CompactChatScreen extends Screen {
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
 		McChatConfig cfg = McChatClient.config();
-		int panelBottom = (int) Math.floor(boxTop * scale) - 2;
+		int panelBottom = ChatPanelRenderer.panelBottom(height, font, scale);
 
 		if (error != null) {
 			graphics.text(font, error, ChatPanelRenderer.MARGIN_X + 4, panelBottom - font.lineHeight - 1, ERROR_COLOR, true);

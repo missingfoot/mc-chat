@@ -31,7 +31,23 @@ public final class ChatPanelRenderer {
 	private record Line(FormattedCharSequence text, PlayerSkin head) {
 	}
 
+	/** Input box height in scaled units is font.lineHeight + INPUT_PAD. */
+	public static final int INPUT_PAD = 5;
+
 	private ChatPanelRenderer() {
+	}
+
+	/** Top of the chat input box, in scaled units (the box itself is drawn at the text scale). */
+	public static int inputTop(int guiHeight, Font font, float scale) {
+		return (int) Math.floor((guiHeight - BOTTOM_OFFSET) / scale) - (font.lineHeight + INPUT_PAD);
+	}
+
+	/**
+	 * Bottom edge of the message panel in GUI pixels: just above where the input box goes, whether or not chat
+	 * is open, so the panel doesn't jump when the input box appears or disappears.
+	 */
+	public static int panelBottom(int guiHeight, Font font, float scale) {
+		return (int) Math.floor(inputTop(guiHeight, font, scale) * scale) - 2;
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package dev.mcchat.client;
 
+import dev.mcchat.core.ChatRules;
 import dev.mcchat.core.McChatConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -25,7 +26,8 @@ public final class ChatHudPanel {
 			return;
 		}
 		McChatConfig cfg = McChatClient.config();
+		float scale = ChatRules.textScale(mc.getWindow().getGuiScale(), cfg.textSize);
 		ChatPanelRenderer.draw(g, mc.font, cfg, ClientChatState.entries(), cfg.visibleLines, 0, false,
-				g.guiHeight() - ChatPanelRenderer.BOTTOM_OFFSET);
+				ChatPanelRenderer.panelBottom(g.guiHeight(), mc.font, scale));
 	}
 }
