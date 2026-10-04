@@ -99,8 +99,10 @@ class ChatRulesTest {
 	}
 
 	@Test
-	void textFadesOutCompletelyOverTheFadePhase() {
-		assertEquals(0.225f, text(12_500), 0.001f);
+	void textFadesDownToTheShaderFloorThenDisappears() {
+		// Minecraft's text shader discards alpha < 0.1, so the fade ends at 0.1 and then everything goes at once.
+		assertEquals(0.275f, text(12_500), 0.001f);
+		assertEquals(0.1f, text(14_999), 0.001f);
 		assertEquals(0f, text(15_000));
 		assertEquals(0f, text(60_000));
 	}
@@ -112,7 +114,7 @@ class ChatRulesTest {
 
 	@Test
 	void zeroLengthPhasesDoNotDivideByZero() {
-		assertEquals(0.36f, ChatRules.textAlpha(0, 6_000, 5, 0, 5, 0.45f), 0.001f); // no dim phase: straight into fading
+		assertEquals(0.38f, ChatRules.textAlpha(0, 6_000, 5, 0, 5, 0.45f), 0.001f); // no dim phase: straight into fading
 		assertEquals(0.45f, ChatRules.textAlpha(0, 5_000, 5, 0, 0, 0.45f), 0.001f); // no dim, no fade: snaps to dim
 	}
 

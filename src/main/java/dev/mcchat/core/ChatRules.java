@@ -6,6 +6,11 @@ import java.util.UUID;
 public final class ChatRules {
 	public static final long GROUP_WINDOW_MILLIS = 120_000;
 	public static final long BOX_FADE_MILLIS = 500;
+	/**
+	 * Minecraft's text shader discards pixels with alpha below 0.1, so text can't fade any lower than this.
+	 * The fade ends here and the panel (text and heads together) then disappears in one step.
+	 */
+	public static final float TEXT_ALPHA_FLOOR = 0.1f;
 
 	private ChatRules() {
 	}
@@ -21,7 +26,7 @@ public final class ChatRules {
 
 	/**
 	 * Panel text opacity, timed from the newest message: full for brightSeconds, then dims linearly to dimOpacity
-	 * over dimSeconds, then fades linearly to 0 over fadeSeconds. fadeSeconds 0 keeps it dim forever.
+	 * over dimSeconds, then fades linearly to TEXT_ALPHA_FLOOR over fadeSeconds and disappears. fadeSeconds 0 keeps it dim forever.
 	 */
 	public static float textAlpha(long newestReceivedMillis, long nowMillis, int brightSeconds, int dimSeconds,
 			int fadeSeconds, float dimOpacity) {
@@ -38,7 +43,7 @@ public final class ChatRules {
 			return dimOpacity;
 		}
 		long fadeEnd = dimEnd + fadeSeconds * 1000L;
-		return t < fadeEnd ? lerp(dimOpacity, 0f, (t - dimEnd) / (float) (fadeEnd - dimEnd)) : 0f;
+		return t < fadeEnd ? lerp(dimOpacity, TEXT_ALPHA_FLOOR, (t - dimEnd) / (float) (fadeEnd - dimEnd)) : 0f;
 	}
 
 	/** Background box opacity: full for brightSeconds after the newest message, then gone over BOX_FADE_MILLIS. */
