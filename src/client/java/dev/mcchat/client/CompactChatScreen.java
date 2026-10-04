@@ -109,6 +109,10 @@ public class CompactChatScreen extends Screen {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
+		// Right arrow at the end of the text accepts the highlighted suggestion, same as Tab.
+		if (event.isRight() && suggestions.isVisible() && input.getCursorPosition() == input.getValue().length()) {
+			event = new KeyEvent(InputConstants.KEY_TAB, 0, 0);
+		}
 		// Suggestions get first go: Tab, arrows while the popup is open, Esc to close the popup.
 		if (suggestions.keyPressed(event)) {
 			return true;

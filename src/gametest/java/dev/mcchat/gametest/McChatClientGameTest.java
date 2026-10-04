@@ -88,6 +88,17 @@ public class McChatClientGameTest implements FabricClientGameTest {
 			context.takeScreenshot("mcchat-05b-suggestions-size-minus-1");
 			context.setScreen(() -> null);
 
+			// Right arrow at the end of the text accepts the highlighted suggestion, like Tab.
+			context.getInput().pressKey(options -> options.keyChat);
+			context.waitForScreen(CompactChatScreen.class);
+			context.getInput().typeChars("/si");
+			context.waitTicks(5);
+			context.getInput().pressKey(InputConstants.KEY_RIGHT);
+			context.getInput().typeChars(" -2");
+			context.getInput().pressKey(InputConstants.KEY_RETURN);
+			context.waitForScreen(null);
+			check(context.computeOnClient(mc -> McChatClient.config().textSize) == -2, "Right arrow completed /si to /size");
+
 			// Typing a command into the T chat runs it instead of sending it as a message.
 			int entriesBefore = entryCount(context);
 			context.getInput().pressKey(options -> options.keyChat);

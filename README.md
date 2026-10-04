@@ -14,7 +14,7 @@ that's already covered.
 ## Use
 
 - **T** — open chat (rebind via Controls → "Open Chat"). Anything starting with `/` runs as a command.
-  Command suggestions and Tab-completion work like vanilla.
+  Command suggestions and Tab-completion work like vanilla; Right arrow at the end of the line also accepts a suggestion.
 - **Enter** send · **Esc** close · **Up/Down** previous messages · **Mouse wheel / PgUp / PgDn** scroll.
 - **/size** — chat text size: `/size 0` normal, `/size -1` / `-2` smaller, `/size 1` / `2` bigger.
   Sizes stay crisp at any GUI scale.
