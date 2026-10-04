@@ -5,6 +5,7 @@ import dev.mcchat.server.McChatServer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -18,7 +19,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Dev-only fake chat partner for ./gradlew runDevServer. Inert unless -Dmcchat.friendbot=true.
- * Replies to your messages after a short delay; /friend say|auto|spam for manual control.
+ * Replies to your messages after a short delay; /friend say|auto|spam for manual control. Ops every joining player.
  */
 public class FriendBot implements ModInitializer {
 	private static final UUID ID = UUID.nameUUIDFromBytes("mcchat-friend-bot".getBytes(StandardCharsets.UTF_8));
@@ -48,6 +49,9 @@ public class FriendBot implements ModInitializer {
 			}
 		});
 		ServerTickEvents.END_SERVER_TICK.register(FriendBot::onTick);
+		// Test server only: op everyone so admin commands (/time, /gamemode, ...) work.
+		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> server.getCommands()
+				.performPrefixedCommand(server.createCommandSourceStack(), "op " + handler.getPlayer().getName().getString()));
 		CommandRegistrationCallback.EVENT.register((dispatcher, buildContext, selection) -> dispatcher.register(
 				Commands.literal("friend")
 						.then(Commands.literal("say").then(Commands.argument("message", StringArgumentType.greedyString())
