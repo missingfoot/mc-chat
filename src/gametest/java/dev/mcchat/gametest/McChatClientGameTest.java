@@ -79,6 +79,18 @@ public class McChatClientGameTest implements FabricClientGameTest {
 			check(context.computeOnClient(mc -> McChatClient.config().textSize) == -1, "/size -1 sets text size");
 			send(context, world, "crisp text at size -1");
 			context.takeScreenshot("mcchat-05a-size-minus-1");
+
+			// Typing a command into the T chat runs it instead of sending it as a message.
+			int entriesBefore = entryCount(context);
+			context.getInput().pressKey(options -> options.keyChat);
+			context.waitForScreen(CompactChatScreen.class);
+			context.getInput().typeChars("/size 0");
+			context.getInput().pressKey(InputConstants.KEY_RETURN);
+			context.waitForScreen(null);
+			world.getConnection().waitForServerboundPackets();
+			world.getConnection().waitForClientboundPackets();
+			check(context.computeOnClient(mc -> McChatClient.config().textSize) == 0, "/size 0 typed in T chat runs as a command");
+			check(entryCount(context) == entriesBefore, "a command typed in T chat is not sent as a chat message");
 		}
 
 		// History survives leaving and reopening the world.

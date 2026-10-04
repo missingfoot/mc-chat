@@ -108,7 +108,17 @@ public class CompactChatScreen extends Screen {
 	}
 
 	private void send() {
-		String text = TextSanitizer.sanitize(input.getValue());
+		String raw = input.getValue().strip();
+		if (raw.startsWith("/")) {
+			// Same path vanilla chat uses, so server commands and Fabric client commands (like /size) both work.
+			if (raw.length() > 1 && minecraft.player != null) {
+				minecraft.player.connection.sendCommand(raw.substring(1));
+				McChatClient.sentHistory().add(raw);
+			}
+			onClose();
+			return;
+		}
+		String text = TextSanitizer.sanitize(raw);
 		if (text.isEmpty()) {
 			onClose();
 			return;
