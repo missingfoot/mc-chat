@@ -62,7 +62,6 @@ public class CompactChatScreen extends Screen {
 			suggestions.updateCommandInfo();
 		});
 		addRenderableWidget(input);
-		setInitialFocus(input);
 
 		// CommandSuggestions anchors its popup to its screen's bottom edge (vanilla's input sits there).
 		// Give it a stand-in screen whose bottom edge is just below our input box, in scaled units.
@@ -75,6 +74,16 @@ public class CompactChatScreen extends Screen {
 
 		McChatClient.sentHistory().resetCursor();
 		ClientChatState.markRead();
+	}
+
+	/**
+	 * Screen calls this right after init(). Its default only focuses something when the last input was a keyboard
+	 * navigation key, and Controlify clears focus at the start of it, which would leave the input unfocused after a
+	 * mouse click. Vanilla ChatScreen overrides it the same way.
+	 */
+	@Override
+	protected void setInitialFocus() {
+		setInitialFocus(input);
 	}
 
 	@Override
