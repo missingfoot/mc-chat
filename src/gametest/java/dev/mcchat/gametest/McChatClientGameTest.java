@@ -80,6 +80,14 @@ public class McChatClientGameTest implements FabricClientGameTest {
 			send(context, world, "crisp text at size -1");
 			context.takeScreenshot("mcchat-05a-size-minus-1");
 
+			// Command suggestions pop up above the (scaled) input box while typing a command.
+			context.getInput().pressKey(options -> options.keyChat);
+			context.waitForScreen(CompactChatScreen.class);
+			context.getInput().typeChars("/m"); // /me, /msg: available without cheats in the test world
+			context.waitTicks(5);
+			context.takeScreenshot("mcchat-05b-suggestions-size-minus-1");
+			context.setScreen(() -> null);
+
 			// Typing a command into the T chat runs it instead of sending it as a message.
 			int entriesBefore = entryCount(context);
 			context.getInput().pressKey(options -> options.keyChat);
