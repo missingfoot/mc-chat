@@ -25,6 +25,9 @@ public class CompactChatScreen extends Screen {
 	private static final int SUGGESTION_FILL = 0xD0000000;
 	private static final int ERROR_COLOR = 0xFFFF6B6B;
 	private static final String NOT_INSTALLED = "MC Chat isn't installed on the server";
+	private static final String KEY_TAB = "key.keyboard.tab";
+	private static final String KEY_PAGE_UP = "key.keyboard.page.up";
+	private static final String KEY_PAGE_DOWN = "key.keyboard.page.down";
 
 	private EditBox input;
 	private CommandSuggestions suggestions;
@@ -110,7 +113,7 @@ public class CompactChatScreen extends Screen {
 	public boolean keyPressed(KeyEvent event) {
 		// Right arrow at the end of the text accepts the highlighted suggestion, same as Tab.
 		if (event.isRight() && suggestions.isVisible() && input.getCursorPosition() == input.getValue().length()) {
-			event = new KeyEvent(InputConstants.KEY_TAB, 0, 0);
+			event = new KeyEvent(InputConstants.getKey(KEY_TAB).getValue(), 0, 0);
 		}
 		// Suggestions get first go: Tab, arrows while the popup is open, Esc to close the popup.
 		if (suggestions.keyPressed(event)) {
@@ -124,9 +127,9 @@ public class CompactChatScreen extends Screen {
 			setInput(history.previous());
 		} else if (event.isDown()) {
 			setInput(history.next());
-		} else if (event.shortcutKey() == InputConstants.KEY_PAGEUP) {
+		} else if (isKey(event, KEY_PAGE_UP)) {
 			scrollBy(pageLines);
-		} else if (event.shortcutKey() == InputConstants.KEY_PAGEDOWN) {
+		} else if (isKey(event, KEY_PAGE_DOWN)) {
 			scrollBy(-pageLines);
 		} else {
 			return super.keyPressed(event);
@@ -150,6 +153,14 @@ public class CompactChatScreen extends Screen {
 		}
 		scrollBy((int) Math.signum(scrollY) * 3);
 		return true;
+	}
+
+	/**
+	 * Keys are matched by name, not by InputConstants.KEY_* numbers: those are compile-time constants and the
+	 * numbering changed between 26.2 (GLFW codes) and 26.3 (SDL codes), so baked-in numbers break on one of them.
+	 */
+	private static boolean isKey(KeyEvent event, String keyName) {
+		return InputConstants.getKey(event).getName().equals(keyName);
 	}
 
 	private void scrollBy(int lines) {
