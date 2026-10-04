@@ -1,7 +1,4 @@
-[00:55:18] [Test worker/WARN]: Skipping corrupt chat history line: not json at all
-[00:55:18] [Test worker/WARN]: Skipping corrupt chat history line: {"senderId":"not-a-uuid","senderName":"x","text":"y","timestampMillis":1}
-[00:55:18] [Test worker/WARN]: Skipping corrupt chat history line: {"text":"missing fields"}
-[00:55:18] [Test worker/WARN]: Couldn't read /tmp/junit-6134011658585110654/mcchat.json, using defaults
+[01:02:31] [Test worker/WARN]: Couldn't read /tmp/junit-12814672535025687311/mcchat.json, using defaults
 com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Expected ':' at line 1 column 9 path $.this
 See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
 	at com.google.gson.Gson.fromJson(Gson.java:1106)
@@ -106,7 +103,10 @@ See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
 	at com.google.gson.internal.bind.ReflectiveTypeAdapterFactory$Adapter.read(ReflectiveTypeAdapterFactory.java:515)
 	at com.google.gson.Gson.fromJson(Gson.java:1080)
 	... 93 more
-[00:55:19] [Test worker/WARN]: Invalid mcchat.json value scale=9.0, using default
-[00:55:19] [Test worker/WARN]: Invalid mcchat.json value width=5, using default
-[00:55:19] [Test worker/WARN]: Invalid mcchat.json value visibleLines=-1, using default
-[00:55:19] [Test worker/WARN]: Invalid mcchat.json value soundVolume=3.0, using default
+[01:02:31] [Test worker/WARN]: Invalid mcchat.json value scale=9.0, using default
+[01:02:31] [Test worker/WARN]: Invalid mcchat.json value width=5, using default
+[01:02:31] [Test worker/WARN]: Invalid mcchat.json value visibleLines=-1, using default
+[01:02:31] [Test worker/WARN]: Invalid mcchat.json value soundVolume=3.0, using default
+[01:02:31] [Test worker/WARN]: Skipping corrupt chat history line: not json at all
+[01:02:31] [Test worker/WARN]: Skipping corrupt chat history line: {"senderId":"not-a-uuid","senderName":"x","text":"y","timestampMillis":1}
+[01:02:31] [Test worker/WARN]: Skipping corrupt chat history line: {"text":"missing fields"}

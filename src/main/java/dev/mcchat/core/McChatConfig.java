@@ -20,7 +20,7 @@ public final class McChatConfig {
 	public int width = 200;
 	public int visibleLines = 5;
 	public int expandedLines = 15;
-	public int brightSeconds = 30;
+	public int brightSeconds = 10;
 	public double dimOpacity = 0.45;
 	public boolean soundEnabled = true;
 	public double soundVolume = 0.4;

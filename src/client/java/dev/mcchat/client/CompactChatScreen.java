@@ -66,8 +66,7 @@ public class CompactChatScreen extends Screen {
 		scroll = ChatRules.clampScroll(scroll, totalLines, cfg.expandedLines);
 
 		int x0 = ChatPanelRenderer.MARGIN_X;
-		graphics.fill(x0, inputTop, x0 + cfg.width, inputTop + INPUT_HEIGHT, 0x80000000);
-		graphics.fill(x0, inputTop, x0 + 1, inputTop + INPUT_HEIGHT, 0xFF000000 | ChatPanelRenderer.ACCENT);
+		graphics.fill(x0, inputTop, x0 + cfg.width, inputTop + INPUT_HEIGHT, ChatPanelRenderer.argb(ChatPanelRenderer.BOX_OPACITY, 0x000000));
 		super.extractRenderState(graphics, mouseX, mouseY, partialTick);
 	}
 

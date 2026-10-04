@@ -19,6 +19,9 @@ public final class ChatPanelRenderer {
 	public static final int MARGIN_X = 4;
 	public static final int BOTTOM_OFFSET = 50;
 
+	/** Background box opacity while messages are bright (and while typing). */
+	public static final float BOX_OPACITY = 0.55f;
+
 	private static final int PAD = 3;
 	private static final int HEAD_GAP = 3;
 
@@ -71,8 +74,7 @@ public final class ChatPanelRenderer {
 		int y1 = bottomY;
 		int y0 = y1 - (int) Math.ceil(shown.size() * lineHeight * scale) - PAD * 2;
 		if (boxAlpha > 0f) {
-			g.fill(x0, y0, x0 + cfg.width, y1, argb(boxAlpha * 0.25f, 0x000000));
-			g.fill(x0, y0, x0 + 1, y1, argb(boxAlpha, ACCENT));
+			g.fill(x0, y0, x0 + cfg.width, y1, argb(boxAlpha * BOX_OPACITY, 0x000000));
 		}
 
 		g.pose().pushMatrix();

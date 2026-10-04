@@ -28,7 +28,7 @@ Created on first launch. Restart the game after editing.
 | `width` | 200 | Panel width in GUI pixels (80–600) |
 | `visibleLines` | 5 | Lines always shown in the corner (0 hides the panel) |
 | `expandedLines` | 15 | Lines shown while typing |
-| `brightSeconds` | 30 | How long new messages stay bright (with the background box) before fading |
+| `brightSeconds` | 10 | How long new messages stay bright (with the background box) before fading |
 | `dimOpacity` | 0.45 | Opacity of older lines (0.1–1.0) |
 | `soundEnabled` | true | Chime when the other person messages |
 | `soundVolume` | 0.4 | Chime volume (0–1) |
