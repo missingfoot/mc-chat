@@ -22,8 +22,9 @@ class McChatConfigTest {
 		assertEquals(200, cfg.width);
 		assertEquals(5, cfg.visibleLines);
 		assertEquals(15, cfg.expandedLines);
-		assertEquals(10, cfg.brightSeconds);
-		assertEquals(30, cfg.hideSeconds);
+		assertEquals(5, cfg.brightSeconds);
+		assertEquals(5, cfg.dimSeconds);
+		assertEquals(5, cfg.fadeSeconds);
 		assertEquals(0.45, cfg.dimOpacity);
 		assertTrue(cfg.soundEnabled);
 		assertEquals(0.4, cfg.soundVolume);

@@ -28,7 +28,7 @@ public final class ChatPanelRenderer {
 	private static final int HEAD_GAP = 3;
 
 	/** One wrapped line; {@code head} is set only on the first line of a message that starts a group. */
-	private record Line(FormattedCharSequence text, float alpha, float boxAlpha, PlayerSkin head) {
+	private record Line(FormattedCharSequence text, PlayerSkin head) {
 	}
 
 	private ChatPanelRenderer() {
@@ -37,6 +37,7 @@ public final class ChatPanelRenderer {
 	/**
 	 * Draws up to {@code maxLines} wrapped lines ending {@code scroll} lines back from the newest,
 	 * with the card's bottom edge at {@code bottomY}. Returns the total number of wrapped lines.
+	 * The whole panel fades as one, timed from the newest message, unless {@code forceBright}.
 	 */
 	public static int draw(GuiGraphicsExtractor g, Font font, McChatConfig cfg, List<ClientChatState.Entry> entries,
 			int maxLines, int scroll, boolean forceBright, int bottomY) {
@@ -44,36 +45,36 @@ public final class ChatPanelRenderer {
 		int headSize = font.lineHeight - 1;
 		int textX = headSize + HEAD_GAP;
 		int innerWidth = Math.max(40, (int) ((cfg.width - PAD * 2 - 2) / scale) - textX);
-		long now = System.currentTimeMillis();
 
 		List<Line> lines = new ArrayList<>();
 		ChatMessage previous = null;
 		for (ClientChatState.Entry entry : entries) {
 			ChatMessage m = entry.message();
-			float fade = forceBright ? 0f : ChatRules.fadeProgress(entry.receivedAtMillis(), now, cfg.brightSeconds);
-			float hide = forceBright ? 0f : ChatRules.hideProgress(entry.receivedAtMillis(), now, cfg.hideSeconds);
-			float alpha = ChatRules.lineAlpha(fade, (float) cfg.dimOpacity) * (1f - hide);
-			float boxAlpha = ChatRules.boxAlpha(fade);
 			PlayerSkin head = ChatRules.showHeader(previous, m) ? SkinCache.skinFor(m.senderId()) : null;
 			for (FormattedCharSequence seq : font.split(Component.literal(m.text()), innerWidth)) {
-				lines.add(new Line(seq, alpha, boxAlpha, head));
+				lines.add(new Line(seq, head));
 				head = null;
 			}
 			previous = m;
 		}
-		// Hidden (fully faded) lines take no space, so the box only wraps what's still visible.
-		lines.removeIf(line -> line.alpha() < MIN_VISIBLE_ALPHA);
 		if (lines.isEmpty() || maxLines <= 0) {
 			return lines.size();
 		}
 
-		int[] range = ChatRules.visibleRange(lines.size(), maxLines, scroll);
-		List<Line> shown = lines.subList(range[0], range[1]);
-		float boxAlpha = 0f;
-		for (Line line : shown) {
-			boxAlpha = Math.max(boxAlpha, line.boxAlpha());
+		float textAlpha = 1f;
+		float boxAlpha = 1f;
+		if (!forceBright) {
+			long newest = entries.getLast().receivedAtMillis();
+			long now = System.currentTimeMillis();
+			textAlpha = ChatRules.textAlpha(newest, now, cfg.brightSeconds, cfg.dimSeconds, cfg.fadeSeconds, (float) cfg.dimOpacity);
+			boxAlpha = ChatRules.boxAlpha(newest, now, cfg.brightSeconds);
+			if (textAlpha < MIN_VISIBLE_ALPHA) {
+				return lines.size();
+			}
 		}
 
+		int[] range = ChatRules.visibleRange(lines.size(), maxLines, scroll);
+		List<Line> shown = lines.subList(range[0], range[1]);
 		int lineHeight = font.lineHeight + 1;
 		int x0 = MARGIN_X;
 		int y1 = bottomY;
@@ -82,15 +83,16 @@ public final class ChatPanelRenderer {
 			g.fill(x0, y0, x0 + cfg.width, y1, argb(boxAlpha * BOX_OPACITY, 0x000000));
 		}
 
+		int color = argb(textAlpha, 0xFFFFFF);
 		g.pose().pushMatrix();
 		g.pose().translate(x0 + PAD + 2, y0 + PAD);
 		g.pose().scale(scale, scale);
 		int y = 0;
 		for (Line line : shown) {
 			if (line.head() != null) {
-				PlayerFaceExtractor.extractRenderState(g, line.head(), 0, y, headSize, argb(line.alpha(), 0xFFFFFF));
+				PlayerFaceExtractor.extractRenderState(g, line.head(), 0, y, headSize, color);
 			}
-			g.text(font, line.text(), textX, y, argb(line.alpha(), 0xFFFFFF), true);
+			g.text(font, line.text(), textX, y, color, true);
 			y += lineHeight;
 		}
 		g.pose().popMatrix();

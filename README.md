@@ -2,7 +2,7 @@
 
 A small Fabric mod for Minecraft 26.3 that gives you a private chat that works over the mod's
 own network channel, so it isn't affected by Microsoft's chat restrictions. It's also nicer than vanilla
-chat: compact, bottom-left, chat heads instead of names, messages fade to faint text and then away, and
+chat: compact, bottom-left, chat heads instead of names, the panel fades away a few seconds after the last message, and
 history that survives restarts.
 
 ## Install
@@ -31,9 +31,10 @@ Created on first launch. Restart the game after editing.
 | `width` | 200 | Panel width in GUI pixels (80–600) |
 | `visibleLines` | 5 | Most lines shown in the corner (0 hides the panel) |
 | `expandedLines` | 15 | Lines shown while typing |
-| `brightSeconds` | 10 | How long new messages stay bright (with the background box) before fading |
-| `hideSeconds` | 30 | When messages disappear from the corner (0 = never); T still shows them |
-| `dimOpacity` | 0.45 | Opacity of older lines (0.1–1.0) |
+| `brightSeconds` | 5 | After the newest message: seconds at full brightness with the background box |
+| `dimSeconds` | 5 | Then: seconds over which the text dims to `dimOpacity` |
+| `fadeSeconds` | 5 | Then: seconds over which the text fades out (0 = stay dim) |
+| `dimOpacity` | 0.45 | Text opacity at the end of the dim phase (0.1–1.0) |
 | `soundEnabled` | true | Chime when the other person messages |
 | `soundVolume` | 0.4 | Chime volume (0–1) |
 

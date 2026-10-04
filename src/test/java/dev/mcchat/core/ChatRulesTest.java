@@ -39,28 +39,6 @@ class ChatRulesTest {
 	}
 
 	@Test
-	void fadeProgressIsZeroWhileBrightThenRampsToOne() {
-		assertEquals(0f, ChatRules.fadeProgress(1_000, 1_000 + 29_000, 30));
-		assertEquals(0.5f, ChatRules.fadeProgress(1_000, 1_000 + 30_500, 30), 0.001f);
-		assertEquals(1f, ChatRules.fadeProgress(1_000, 1_000 + 31_000, 30));
-		assertEquals(1f, ChatRules.fadeProgress(0, 1_759_500_000_000L, 30)); // history entries (received at 0) start faded
-	}
-
-	@Test
-	void lineAlphaGoesFromFullToDim() {
-		assertEquals(1f, ChatRules.lineAlpha(0f, 0.45f));
-		assertEquals(0.725f, ChatRules.lineAlpha(0.5f, 0.45f), 0.001f);
-		assertEquals(0.45f, ChatRules.lineAlpha(1f, 0.45f));
-	}
-
-	@Test
-	void boxAlphaFadesOutCompletely() {
-		assertEquals(1f, ChatRules.boxAlpha(0f));
-		assertEquals(0.5f, ChatRules.boxAlpha(0.5f), 0.001f);
-		assertEquals(0f, ChatRules.boxAlpha(1f));
-	}
-
-	@Test
 	void ownMessagesAreNotFromOther() {
 		assertFalse(ChatRules.isFromOther(at(A, 0), A));
 		assertTrue(ChatRules.isFromOther(at(B, 0), A));
@@ -98,15 +76,55 @@ class ChatRulesTest {
 		assertEquals(1f, ChatRules.textScale(1, -1));
 	}
 
-	@Test
-	void hideProgressRampsToOneAfterHideSeconds() {
-		assertEquals(0f, ChatRules.hideProgress(1_000, 1_000 + 29_000, 30));
-		assertEquals(0.5f, ChatRules.hideProgress(1_000, 1_000 + 30_500, 30), 0.001f);
-		assertEquals(1f, ChatRules.hideProgress(1_000, 1_000 + 31_000, 30));
+
+	// Panel timeline from the newest message: 5s bright, 5s dimming, 5s fading out.
+	private static final int BRIGHT = 5;
+	private static final int DIM = 5;
+	private static final int FADE = 5;
+
+	private static float text(long sinceNewestMillis) {
+		return ChatRules.textAlpha(1_000, 1_000 + sinceNewestMillis, BRIGHT, DIM, FADE, 0.45f);
 	}
 
 	@Test
-	void hideSecondsZeroNeverHides() {
-		assertEquals(0f, ChatRules.hideProgress(0, 1_759_500_000_000L, 0));
+	void textIsFullWhileBright() {
+		assertEquals(1f, text(0));
+		assertEquals(1f, text(4_999));
+	}
+
+	@Test
+	void textDimsGraduallyOverTheDimPhase() {
+		assertEquals(0.725f, text(7_500), 0.001f);
+		assertEquals(0.45f, text(10_000), 0.001f);
+	}
+
+	@Test
+	void textFadesOutCompletelyOverTheFadePhase() {
+		assertEquals(0.225f, text(12_500), 0.001f);
+		assertEquals(0f, text(15_000));
+		assertEquals(0f, text(60_000));
+	}
+
+	@Test
+	void fadeSecondsZeroKeepsTextDimForever() {
+		assertEquals(0.45f, ChatRules.textAlpha(0, 1_759_500_000_000L, BRIGHT, DIM, 0, 0.45f));
+	}
+
+	@Test
+	void zeroLengthPhasesDoNotDivideByZero() {
+		assertEquals(0.36f, ChatRules.textAlpha(0, 6_000, 5, 0, 5, 0.45f), 0.001f); // no dim phase: straight into fading
+		assertEquals(0.45f, ChatRules.textAlpha(0, 5_000, 5, 0, 0, 0.45f), 0.001f); // no dim, no fade: snaps to dim
+	}
+
+	@Test
+	void historyFromBeforeJoiningStartsHidden() {
+		assertEquals(0f, ChatRules.textAlpha(0, 1_759_500_000_000L, BRIGHT, DIM, FADE, 0.45f));
+	}
+
+	@Test
+	void boxStaysForBrightSecondsThenFadesQuickly() {
+		assertEquals(1f, ChatRules.boxAlpha(1_000, 1_000 + 4_999, BRIGHT));
+		assertEquals(0.5f, ChatRules.boxAlpha(1_000, 1_000 + 5_250, BRIGHT), 0.001f);
+		assertEquals(0f, ChatRules.boxAlpha(1_000, 1_000 + 5_500, BRIGHT));
 	}
 }

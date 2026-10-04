@@ -24,9 +24,10 @@ public final class McChatConfig {
 	public int width = 200;
 	public int visibleLines = 5;
 	public int expandedLines = 15;
-	public int brightSeconds = 10;
-	/** Seconds after arrival when a message disappears from the corner panel (0 = never). Still shown when chat is open. */
-	public int hideSeconds = 30;
+	/** Corner panel timeline after the newest message: bright with box, then dimming, then fading out (0 = stay dim). */
+	public int brightSeconds = 5;
+	public int dimSeconds = 5;
+	public int fadeSeconds = 5;
 	public double dimOpacity = 0.45;
 	public boolean soundEnabled = true;
 	public double soundVolume = 0.4;
@@ -83,9 +84,13 @@ public final class McChatConfig {
 			warn("brightSeconds", brightSeconds);
 			brightSeconds = d.brightSeconds;
 		}
-		if (hideSeconds < 0 || hideSeconds > 86400) {
-			warn("hideSeconds", hideSeconds);
-			hideSeconds = d.hideSeconds;
+		if (dimSeconds < 0 || dimSeconds > 3600) {
+			warn("dimSeconds", dimSeconds);
+			dimSeconds = d.dimSeconds;
+		}
+		if (fadeSeconds < 0 || fadeSeconds > 3600) {
+			warn("fadeSeconds", fadeSeconds);
+			fadeSeconds = d.fadeSeconds;
 		}
 		if (!(dimOpacity >= 0.1 && dimOpacity <= 1.0)) {
 			warn("dimOpacity", dimOpacity);
